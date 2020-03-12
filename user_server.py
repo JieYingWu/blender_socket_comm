@@ -47,6 +47,11 @@ class UserServer:
         packet = SET_VTX_POS + data
         self.client.send(packet.encode())
 
+    def set_obj_pose(self, x, y, z, roll, pitch, yaw):
+        data = pack_vector([x, y, z, roll, pitch, yaw])
+        packet = SET_OBJ_POSE + data
+        self.client.send(packet.encode())
+
     def get_vtx_count(self):
         packet = GET_VTX_COUNT
         self.client.send(packet.encode())
