@@ -160,20 +160,34 @@ class UserServer:
         mapping = np.concatenate((np.array(np.expand_dims(mapping,1),dtype=np.int32), np.expand_dims(ind,1)), axis=1)
         np.savetxt('grid_order.txt',mapping,fmt='%i')
 
+    def make_mapping_volumetric(self):
+        vtx_count = self.get_vtx_count()
+        blender_mesh = np.zeros((vtx_count,3))
+        for idx in range(vtx_count):
+            pos = self.get_vtx_pos(idx)
+            blender_mesh[idx] = [pos[1], pos[2], pos[3]]
 
+
+        ind = np.lexsort((blender_mesh[:,2], blender_mesh[:,1], blender_mesh[:,0]))
+        print(ind.shape)
+        print(np.arange(vtx_count).shape)
+        mapping = np.concatenate((np.array(np.expand_dims(np.arange(vtx_count),1),dtype=np.int32), np.expand_dims(ind,1)), axis=1)
+        np.savetxt('grid_order_volumetric.txt',mapping,fmt='%i')
+
+        
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print('Please enter at 2 arguments (first indicating use and second mesh path)')
         exit()
         
     us = UserServer()
-    us.create_server(port=3002)
+    us.create_server(port=3001)
     mesh_path = sys.argv[2]
-    mapping = np.loadtxt('grid_order.txt', dtype=np.int)
+#    mapping = np.loadtxt('grid_order.txt', dtype=np.int)
     if sys.argv[1] == 'show':
         us.set_cube_vertices(mesh_path, mapping)
     elif sys.argv[1] == 'map':
-        us.make_mapping(mesh_path)
+        us.make_mapping_volumetric()
     elif sys.argv[1] == 'play':
         us.play_simulation(mesh_path, mapping)
     else:
